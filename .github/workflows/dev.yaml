@@ -26,16 +26,6 @@ jobs:
         run: flutter --version
       - name: Flutter doctor
         run: flutter doctor -v
-      - name: Print work decretory
-        run: pwd
-      - name: List folder
-        run: ls
-      - name: Change directly
-        run: |
-          pwd
-          ls
-          cd android
-          ./gradlew
       - name: Create pixel emulator
         run: flutter emulators --create pixel
   dependencies:
