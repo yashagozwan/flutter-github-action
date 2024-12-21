@@ -50,8 +50,12 @@ jobs:
       - name: Launch Emulator
         run: |
           $ANDROID_SDK_ROOT/emulator/emulator -list-avds
-          $ANDROID_SDK_ROOT/tools/bin/avdmanager create avd -n testAVD -k "system-images;android-30;google_apis;x86_64"
-          $ANDROID_SDK_ROOT/emulator/emulator -avd testAVD
+          nohup $ANDROID_SDK_ROOT/emulator/emulator -avd testAVD -no-snapshot-load -no-audio -no-window &
+
+      - name: Wait for Emulator to Boot
+        run: |
+          adb wait-for-device
+          adb shell getprop sys.boot_completed
 
       - name: List Available AVDs
         run: avdmanager list avd
