@@ -5,7 +5,6 @@ import 'package:injectable/injectable.dart';
 
 @module
 abstract class RemoteDataSourceModule {
-  @dev
   @lazySingleton
   AddressRemoteDataSource get addressRemoteDataSource {
     return AddressRemoteDataSource(getIt<Dio>());

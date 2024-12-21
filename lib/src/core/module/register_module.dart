@@ -9,11 +9,9 @@ import 'package:injectable/injectable.dart';
 
 @module
 abstract class RegisterModule {
-  @dev
   @lazySingleton
   Dio get dio => Dio()..interceptors.add(getIt<AliceDioAdapter>());
 
-  @dev
   @lazySingleton
   Alice get alice {
     return Alice(
