@@ -24,7 +24,7 @@ jobs:
           cmdline-tools-version: 12266719
       - name: Install Android Emulator System Image
         run: |
-          sdkmanager "system-images;android-33;google_apis;x86_64"
+
           sdkmanager "system-images;android-27;google_apis_playstore;x86"
           sdkmanager --licenses
       - name: Add Emulator to PATH
@@ -38,8 +38,14 @@ jobs:
         run: flutter --version
       - name: Flutter doctor
         run: flutter doctor -v
+      - name: Devices
+        run: flutter devices
       - name: Create pixel emulator
         run: flutter emulators --create pixel
+      - name: Emulators
+        run: flutter emulators
+      - name: Launch emulators
+        run: flutter emulators --launch pixel --cold
   dependencies:
     needs: flutter-setup
     runs-on: ubuntu-latest
