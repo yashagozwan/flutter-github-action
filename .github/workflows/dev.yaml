@@ -26,6 +26,10 @@ jobs:
         run: flutter doctor -v
       - name: Print work decretory
         run: pwd
+      - name: List folder
+        run: ls
+      - name: Create pixel emulator
+        run: flutter emulators --create pixel
   dependencies:
     needs: flutter-setup
     runs-on: ubuntu-latest
