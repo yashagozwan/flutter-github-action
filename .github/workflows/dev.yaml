@@ -16,6 +16,7 @@ jobs:
       - name: Flutter check
         run: flutter --version
   dependencies:
+    needs: flutter-setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -31,6 +32,7 @@ jobs:
       - name: Reinstall dependencies
         run: flutter pub get
   analyze:
+    needs: dependencies
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -42,6 +44,7 @@ jobs:
       - name: Flutter analyze
         run: flutter analyze
   tests:
+    needs: analyze
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
