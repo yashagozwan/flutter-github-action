@@ -132,6 +132,6 @@ jobs:
       - name: Create pixel emulator
         run: flutter emulators --create pixel
       - name: Launch emulators
-        run: flutter emulators --launch pixel --cold
+        run: flutter emulators --launch flutter_emulator --cold
       - name: Integration test running
         run: flutter test integration_test/home_test.dart
