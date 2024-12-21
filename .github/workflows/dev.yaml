@@ -18,14 +18,14 @@ jobs:
         with:
           java-version: "18"
           distribution: "temurin"
-      - name: Check SHA-256
-        run: cd android && ./gradlew
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
       - name: Flutter check
         run: flutter --version
       - name: Flutter doctor
         run: flutter doctor -v
+      - name: Print work decretory
+        run: pwd
   dependencies:
     needs: flutter-setup
     runs-on: ubuntu-latest
