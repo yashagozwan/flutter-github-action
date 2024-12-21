@@ -45,7 +45,7 @@ jobs:
       - name: Emulators
         run: flutter emulators
       - name: Launch emulators
-        run: flutter emulators --launch pixel --cold
+        run: flutter emulators --launch flutter_emulator --cold
   dependencies:
     needs: flutter-setup
     runs-on: ubuntu-latest
