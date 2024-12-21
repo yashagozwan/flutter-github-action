@@ -24,6 +24,7 @@ jobs:
           cmdline-tools-version: 12266719
       - name: Install Android Emulator System Image
         run: |
+          sdkmanager "system-images;android-33;google_apis;x86_64"
           sdkmanager "system-images;android-27;google_apis_playstore;x86"
           sdkmanager --licenses
       - name: Add Emulator to PATH
@@ -120,6 +121,7 @@ jobs:
           cmdline-tools-version: 12266719
       - name: Install Android Emulator System Image
         run: |
+          sdkmanager "system-images;android-33;google_apis;x86_64"
           sdkmanager "system-images;android-27;google_apis_playstore;x86"
           sdkmanager --licenses
       - name: Add Emulator to PATH
