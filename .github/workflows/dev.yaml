@@ -26,6 +26,8 @@ jobs:
         run: |
           sdkmanager "system-images;android-33;google_apis;x86_64"
           sdkmanager --licenses
+      - name: Add Emulator to PATH
+        run: echo "${ANDROID_HOME}/emulator" >> $GITHUB_PATH
       - name: Create Android Emulator
         run: |
           echo "no" | avdmanager create avd -n pixel -k "system-images;android-33;google_apis;x86_64" -d pixel
