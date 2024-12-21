@@ -20,6 +20,8 @@ jobs:
           distribution: "temurin"
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: 12266719
       - name: Flutter check
         run: flutter --version
       - name: Flutter doctor
@@ -28,6 +30,12 @@ jobs:
         run: pwd
       - name: List folder
         run: ls
+      - name: Change directly
+        run: |
+          pwd
+          ls
+          cd android
+          ./gradlew
       - name: Create pixel emulator
         run: flutter emulators --create pixel
   dependencies:
