@@ -58,7 +58,7 @@ jobs:
       - name: Flutter test
         run: flutter test
   coverage:
-    needs: tests
+    needs: analyze
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
