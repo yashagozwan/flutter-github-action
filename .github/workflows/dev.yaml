@@ -22,6 +22,17 @@ jobs:
         uses: android-actions/setup-android@v3
         with:
           cmdline-tools-version: 12266719
+      - name: Install Android Emulator System Image
+        run: |
+          sdkmanager "system-images;android-33;google_apis;x86_64"
+          sdkmanager --licenses
+      - name: Create Android Emulator
+        run: |
+          echo "no" | avdmanager create avd -n pixel -k "system-images;android-33;google_apis;x86_64" -d pixel
+      - name: Start Emulator
+        run: |
+          emulator -avd pixel -no-snapshot -no-audio -no-window &
+          adb wait-for-device
       - name: Flutter check
         run: flutter --version
       - name: Flutter doctor
