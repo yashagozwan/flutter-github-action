@@ -32,8 +32,8 @@ import 'package:flutter_my_alice/src/presentation/features/registration/bloc/reg
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 
-const String _dev = 'dev';
 const String _test = 'test';
+const String _dev = 'dev';
 
 extension GetItInjectableX on _i174.GetIt {
 // initializes the registration of main-scope dependencies inside of GetIt
@@ -48,22 +48,14 @@ extension GetItInjectableX on _i174.GetIt {
     );
     final registerModule = _$RegisterModule();
     final remoteDataSourceModule = _$RemoteDataSourceModule();
+    gh.lazySingleton<_i361.Dio>(() => registerModule.dio);
+    gh.lazySingleton<_i917.Alice>(() => registerModule.alice);
     gh.lazySingleton<_i409.GlobalKey<_i409.NavigatorState>>(
         () => registerModule.navigationKey);
     gh.lazySingleton<_i433.AliceDioAdapter>(() => registerModule.dioAlice);
-    gh.lazySingleton<_i882.CustomTheme>(() => _i882.CustomTheme());
-    gh.lazySingleton<_i361.Dio>(
-      () => registerModule.dio,
-      registerFor: {_dev},
-    );
-    gh.lazySingleton<_i917.Alice>(
-      () => registerModule.alice,
-      registerFor: {_dev},
-    );
     gh.lazySingleton<_i928.AddressRemoteDataSource>(
-      () => remoteDataSourceModule.addressRemoteDataSource,
-      registerFor: {_dev},
-    );
+        () => remoteDataSourceModule.addressRemoteDataSource);
+    gh.lazySingleton<_i882.CustomTheme>(() => _i882.CustomTheme());
     gh.lazySingleton<_i410.NavigationService>(() =>
         _i410.NavigationService(gh<_i719.GlobalKey<_i719.NavigatorState>>()));
     gh.lazySingleton<_i683.IAddressRepository>(
