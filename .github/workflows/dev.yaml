@@ -51,7 +51,28 @@ jobs:
         run: |
           $ANDROID_SDK_ROOT/emulator/emulator -list-avds
           nohup $ANDROID_SDK_ROOT/emulator/emulator -avd testAVD -no-snapshot-load -no-audio -no-window &
-
+        
+      - name: Wait for Emulator to Boot
+        run: |
+          echo "Waiting for emulator to boot..."
+          boot_completed=0
+          retry=0
+          max_retries=30
+          while [[ $boot_completed -ne 1 && $retry -lt $max_retries ]]; do
+            boot_completed=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+            if [[ $boot_completed -ne 1 ]]; then
+              echo "Emulator not ready yet, retrying in 10 seconds... ($((retry + 1))/$max_retries)"
+              sleep 10
+            fi
+            retry=$((retry + 1))
+          done
+          if [[ $boot_completed -ne 1 ]]; then
+            echo "Emulator failed to boot within the timeout period."
+            exit 1
+          else
+            echo "Emulator booted successfully!"
+          fi
+        
       - name: Wait for Emulator to Boot
         run: |
           adb wait-for-device
