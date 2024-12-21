@@ -7,8 +7,7 @@ class RegistrationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = BlocProvider.of<RegistrationBloc>(context)
-      ..add(RegistrationEvent.initial());
+    BlocProvider.of<RegistrationBloc>(context).add(RegistrationEvent.initial());
 
     return const Scaffold();
   }
