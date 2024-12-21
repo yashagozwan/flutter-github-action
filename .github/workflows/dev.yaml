@@ -9,15 +9,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.27.1"
+
       - name: Set up JDK 18
         uses: actions/setup-java@v3
         with:
           java-version: "18"
           distribution: "temurin"
+
+      - name: Setup gradle
+        uses: gradle/gradle-build-action@v2
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
@@ -27,21 +33,33 @@ jobs:
           sdkmanager "system-images;android-33;google_apis;x86_64"
           sdkmanager "system-images;android-27;google_apis_playstore;x86"
           sdkmanager --licenses
+
       - name: Add Emulator to PATH
         run: echo "${ANDROID_HOME}/emulator" >> $GITHUB_PATH
-      - name: Create Android Emulator
+
+      - name: Create Android Emulator Step 1
         run: |
           echo "no" | avdmanager create avd -n pixel -k "system-images;android-33;google_apis;x86_64" -d pixel
+
+      - name: Create Android emulator Step 2
+        run: |
+          sdkmanager --install "system-images;android-31;google_apis;x86_64"
+          echo "no" | avdmanager --verbose create avd --force --name testAVD --abi google_apis/x86_64 --package 'system-images;android-31;google_apis;x86_64'
+
+      - name: Launch Emulator
+        run: |
+          $ANDROID_SDK_ROOT/emulator/emulator -avd testAVD
+
       - name: List Available AVDs
         run: avdmanager list avd
       - name: Flutter check
         run: flutter --version
       - name: Flutter doctor
         run: flutter doctor -v
-      - name: Devices
-        run: flutter devices
       - name: Create pixel emulator
         run: flutter emulators --create pixel
+      - name: Devices
+        run: flutter devices
       - name: Emulators
         run: flutter emulators
       - name: Launch emulators
