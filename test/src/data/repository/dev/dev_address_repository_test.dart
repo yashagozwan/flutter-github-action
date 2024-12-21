@@ -9,18 +9,15 @@ void main() {
     late final IAddressRepository addressRepository;
 
     setUpAll(() async {
-      await configureDependencies(Environment.dev);
+      await configureDependencies(Environment.test);
 
       addressRepository = getIt<IAddressRepository>();
     });
 
     test('should return list of provinces when getProvinces called', () async {
       final either = await addressRepository.getProvinces();
-      final provinces = either.fold((_) => null, (success) => success);
-
-      if (provinces == null) {
-        return expect(provinces, isNull);
-      }
+      final provinces = either.fold(
+          (_) => throw Exception('Get provinces fail'), (success) => success);
 
       expect(provinces, isA<List<AddressModel>>());
       expect(provinces, isNotEmpty);
