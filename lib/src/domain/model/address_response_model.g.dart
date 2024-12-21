@@ -11,7 +11,7 @@ AddressResponseModel _$AddressResponseModelFromJson(
     AddressResponseModel(
       message: json['message'] as String?,
       status: (json['status'] as num?)?.toInt(),
-      data: (json['data'] as List<dynamic>?)
+      data: (json['result'] as List<dynamic>?)
           ?.map((e) => AddressModel.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -21,5 +21,5 @@ Map<String, dynamic> _$AddressResponseModelToJson(
     <String, dynamic>{
       'message': instance.message,
       'status': instance.status,
-      'data': instance.data,
+      'result': instance.data?.map((e) => e.toJson()).toList(),
     };
