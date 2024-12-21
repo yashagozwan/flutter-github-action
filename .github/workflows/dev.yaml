@@ -57,3 +57,17 @@ jobs:
           flutter-version: "3.27.1"
       - name: Flutter test
         run: flutter test
+  coverage:
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.27.1"
+      - name: Flutter test
+        run: flutter test --coverage
+      - name: Coverage
+        run: flutter pub run test_cov_console

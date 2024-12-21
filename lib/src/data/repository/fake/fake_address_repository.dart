@@ -8,33 +8,50 @@ import 'package:injectable/injectable.dart';
 @LazySingleton(as: IAddressRepository)
 class FakeAddressRepository implements IAddressRepository {
   @override
-  Future<Either<FailureModel, List<AddressModel>>> geCities(String provinceId) {
-    // TODO: implement geCities
-    throw UnimplementedError();
+  Future<Either<FailureModel, List<AddressModel>>> geCities(
+    String provinceId,
+  ) async {
+    final data = [
+      {'id': '63', 'text': 'Kabupaten Bandung'},
+      {'id': '65', 'text': 'Kabupaten Bandung Barat'},
+      {'id': '67', 'text': 'Kabupaten Bekasi'},
+    ];
+
+    return right(data.map(AddressModel.fromJson).toList());
   }
 
   @override
-  Future<Either<FailureModel, List<AddressModel>>> getDistricts(String cityId) {
+  Future<Either<FailureModel, List<AddressModel>>> getDistricts(
+    String cityId,
+  ) async {
     // TODO: implement getDistricts
     throw UnimplementedError();
   }
 
   @override
-  Future<Either<FailureModel, List<AddressModel>>> getProvinces() {
-    // TODO: implement getProvinces
-    throw UnimplementedError();
+  Future<Either<FailureModel, List<AddressModel>>> getProvinces() async {
+    final data = [
+      {'id': '9', 'text': 'Jawa Barat'},
+      {'id': '10', 'text': 'Jawa Tengah'},
+      {'id': '11', 'text': 'Jawa Timur'},
+    ];
+
+    return right(data.map(AddressModel.fromJson).toList());
   }
 
   @override
   Future<Either<FailureModel, List<AddressModel>>> getSubDistricts(
-      String districtId) {
+    String districtId,
+  ) async {
     // TODO: implement getSubDistricts
     throw UnimplementedError();
   }
 
   @override
   Future<Either<FailureModel, List<AddressModel>>> getZipCode(
-      String cityId, String districtId) {
+    String cityId,
+    String districtId,
+  ) async {
     // TODO: implement getZipCode
     throw UnimplementedError();
   }
