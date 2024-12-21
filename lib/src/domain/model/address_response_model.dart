@@ -16,6 +16,7 @@ class AddressResponseModel {
 
   final String? message;
   final int? status;
+  @JsonKey(name: 'result')
   final List<AddressModel>? data;
 
   Map<String, dynamic> toJson() => _$AddressResponseModelToJson(this);
