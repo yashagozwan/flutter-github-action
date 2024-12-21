@@ -31,10 +31,8 @@ jobs:
       - name: Create Android Emulator
         run: |
           echo "no" | avdmanager create avd -n pixel -k "system-images;android-33;google_apis;x86_64" -d pixel
-      - name: Start Emulator
-        run: |
-          emulator -avd pixel -no-snapshot -no-audio -no-window &
-          adb wait-for-device
+      - name: List Available AVDs
+        run: avdmanager list avd
       - name: Flutter check
         run: flutter --version
       - name: Flutter doctor
