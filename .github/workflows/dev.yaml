@@ -101,6 +101,7 @@ jobs:
       - name: Coverage
         run: flutter pub run test_cov_console
   integration-test:
+    needs: coverage
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
