@@ -30,8 +30,13 @@ jobs:
           sudo apt-get install -y xvfb
           Xvfb :99 -screen 0 640x480x24 &
 
+      - name: Doctor
+        run: flutter doctor
+
+      - name: Emulator
+        run: flutter emulators
+
       - name: Run integration tests
         env:
           DISPLAY: :99
-        run: |
-          flutter test integration_test/home_test.dart
+        run: flutter test integration_test/home_test.dart
