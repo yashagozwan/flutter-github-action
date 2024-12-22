@@ -1,4 +1,4 @@
-name: Flutter Integration Test
+name: Flutter Integration Test with Free Emulator
 
 on: push
 
@@ -7,28 +7,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Setup Java
       - name: Setup Java
         uses: actions/setup-java@v2
         with:
           distribution: "zulu"
           java-version: "11"
 
-      # 3. Setup Flutter
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"
 
-      # 4. Install dependencies
-      - name: Install dependencies
-        run: flutter pub get
-
-      # 5. Install Android Command Line Tools
       - name: Install Android SDK Command Line Tools
         run: |
           sudo mkdir -p /usr/local/lib/android/sdk/cmdline-tools
@@ -39,30 +31,29 @@ jobs:
           echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> $GITHUB_ENV
           echo "PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH" >> $GITHUB_ENV
 
-      # 6. Install Android tools and emulator
       - name: Install Android tools
         run: |
           source $GITHUB_ENV
           sdkmanager --licenses
           sdkmanager "platform-tools" "platforms;android-31" "build-tools;31.0.0" "emulator" "system-images;android-31;default;x86_64"
 
-      # 7. Create Android emulator
-      - name: Create Android emulator
+      - name: Create and Start Emulator
         run: |
           source $GITHUB_ENV
           echo "no" | avdmanager create avd -n test -k "system-images;android-31;default;x86_64" --force
-          emulator -avd test -no-window -no-audio -no-boot-anim &
+          emulator -avd test -no-snapshot -no-window -gpu off -no-boot-anim &
 
-      # 8. Wait for emulator to boot
-      - name: Wait for Android emulator to boot
-        run: |
-          adb wait-for-device
-          adb shell input keyevent 82
-
-      # 9. Run Flutter integration tests
-      - name: Run integration tests
-        env:
-          DISPLAY: :99
+      - name: Wait for Emulator to Boot
         run: |
           source $GITHUB_ENV
-          flutter test integration_test/home_test.dart
+          adb devices
+          adb wait-for-device
+          adb shell "while [[ -z \$(getprop sys.boot_completed) ]]; do sleep 1; done;"
+
+      - name: Unlock Emulator Screen
+        run: adb shell input keyevent 82
+
+      - name: Run Integration Tests
+        env:
+          DISPLAY: :99
+        run: flutter test integration_test/home_test.dart
