@@ -1,4 +1,4 @@
-name: Integration Test
+name: Deployment
 on:
   push:
     branches:
@@ -24,7 +24,7 @@ jobs:
 
   test:
     needs: analyze
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
@@ -34,7 +34,7 @@ jobs:
 
   coverage:
     needs: test
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
