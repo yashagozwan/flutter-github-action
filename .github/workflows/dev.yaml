@@ -1,34 +1,36 @@
-name: Run integration tests
+name: Flutter Integration Test
+
 on: push
- 
+
 jobs:
-  integration-tests:
-    name: Running tests on macOS-latest
-    runs-on: macOS-latest
-    strategy:
-      fail-fast: false
+  integration_test:
+    runs-on: ubuntu-latest
+
     steps:
+      # 1. Checkout code
       - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Setup Java
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'zulu'
-          java-version: '11'
-      - name: Setup Flutter (stable)
+        uses: actions/checkout@v3
+
+      # 2. Set up Flutter
+      - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-      - name: Install Android SDK
-        uses: malinskiy/action-android/install-sdk@release/0.1.2
-      - run: echo $ANDROID_HOME
-      - run: sdkmanager --install "ndk;23.1.7779620"
-      - run: sdkmanager --install "build-tools;30.0.3"
-      - run: flutter pub get
-      - uses: malinskiy/action-android/emulator-run-cmd@release/0.1.2
-        with:
-          cmd: flutter test integration_test
-          api: 31
-          cmdOptions: -no-snapshot-save -noaudio -no-boot-anim -cores 2 -memory 3072 -no-window
-          tag: google_apis
-          abi: x86_64
+          flutter-version: stable
+
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: flutter pub get
+
+      # 4. Enable integration test device
+      - name: Set up virtual display for integration tests
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+          Xvfb :99 -screen 0 640x480x24 &
+
+      # 5. Run integration tests
+      - name: Run integration tests
+        env:
+          DISPLAY: :99
+        run: |
+          flutter test integration_test/home_test.dart
