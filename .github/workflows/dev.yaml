@@ -4,7 +4,47 @@ on:
     branches:
       - main
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+      - run: flutter doctor
+
+  analyze:
+    needs: setup
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+      - run: flutter analyze
+
+  test:
+    needs: analyze
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+      - run: flutter test
+
+  coverage:
+    needs: test
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+      - run: flutter test --coverage
+      - run: dart run test_cov_console
+
   integration-test:
+    needs: coverage
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,3 +56,13 @@ jobs:
           channel: "stable"
       - run: flutter pub get
       - run: flutter test integration_test/home_test.dart
+
+  build-debug-apk:
+    needs: integration-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+      - run: flutter build apk
