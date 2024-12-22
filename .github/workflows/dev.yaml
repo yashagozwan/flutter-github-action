@@ -1,36 +1,30 @@
-name: Dev
-on:
-  push:
-    branches: main
-
+name: Run integration tests
+on: push
+ 
 jobs:
-  flutter-setup:
-    runs-on: ubuntu-latest
+  integration-tests:
+    name: Running tests on macOS-latest
+    runs-on: macOS-latest
+    strategy:
+      fail-fast: false
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Flutter
+        uses: actions/checkout@v2
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+      - name: Setup Flutter (stable)
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.27.1"
-
-      - name: Set up JDK 18
-        uses: actions/setup-java@v3
-        with:
-          java-version: "18"
-          distribution: "temurin"
-
-      - name: Setup gradle
-        uses: gradle/gradle-build-action@v2
-
+          channel: 'stable'
       - name: Install Android SDK
         uses: malinskiy/action-android/install-sdk@release/0.1.2
-      - run: |
-          echo $ANDROID_HOME
-          sdkmanager --install "ndk;23.1.7779620"
-          sdkmanager --install "build-tools;30.0.3"
-          flutter pub get
+      - run: echo $ANDROID_HOME
+      - run: sdkmanager --install "ndk;23.1.7779620"
+      - run: sdkmanager --install "build-tools;30.0.3"
+      - run: flutter pub get
       - uses: malinskiy/action-android/emulator-run-cmd@release/0.1.2
         with:
           cmd: flutter test integration_test
@@ -38,131 +32,3 @@ jobs:
           cmdOptions: -no-snapshot-save -noaudio -no-boot-anim -cores 2 -memory 3072 -no-window
           tag: google_apis
           abi: x86_64
-    
-      - name: Flutter check
-        run: flutter --version
-
-      - name: Flutter doctor
-        run: flutter doctor -v
-
-      - name: Create pixel emulator
-        run: flutter emulators --create pixel
-
-      - name: Devices
-        run: flutter devices
-
-      - name: Emulators
-        run: flutter emulators
-
-      - name: Launch emulators
-        run: flutter emulators --launch flutter_emulator --cold
-  dependencies:
-    needs: flutter-setup
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.27.1"
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Clean dependencies
-        run: flutter clean
-
-      - name: Reinstall dependencies
-        run: flutter pub get
-  analyze:
-    needs: dependencies
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-
-        with:
-          flutter-version: "3.27.1"
-
-      - name: Flutter analyze
-        run: flutter analyze
-  tests:
-    needs: analyze
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.27.1"
-
-      - name: Flutter test
-        run: flutter test
-  coverage:
-    needs: tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.27.1"
-
-      - name: Flutter test
-        run: flutter test --coverage
-
-      - name: Coverage
-        run: flutter pub run test_cov_console
-  integration-test:
-    needs: coverage
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.27.1"
-
-      - name: Set up JDK 18
-        uses: actions/setup-java@v3
-        with:
-          java-version: "18"
-          distribution: "temurin"
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          cmdline-tools-version: 12266719
-
-      - name: Install Android Emulator System Image
-        run: |
-          sdkmanager "system-images;android-33;google_apis;x86_64"
-          sdkmanager "system-images;android-27;google_apis_playstore;x86"
-          sdkmanager --licenses
-
-      - name: Add Emulator to PATH
-        run: echo "${ANDROID_HOME}/emulator" >> $GITHUB_PATH
-
-      - name: Create Android Emulator
-        run: |
-          echo "no" | avdmanager create avd -n pixel -k "system-images;android-33;google_apis;x86_64" -d pixel
-
-      - name: Create pixel emulator
-        run: flutter emulators --create pixel
-
-      - name: Launch emulators
-        run: flutter emulators --launch flutter_emulator --cold
-
-      - name: Integration test running
-        run: flutter test integration_test/home_test.dart
