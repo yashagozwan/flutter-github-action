@@ -11,7 +11,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Setup Java (required for Android SDK)
+      # 2. Setup Java
       - name: Setup Java
         uses: actions/setup-java@v2
         with:
@@ -19,7 +19,7 @@ jobs:
           java-version: "11"
 
       # 3. Setup Flutter
-      - name: Setup Flutter (stable)
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"
@@ -31,13 +31,13 @@ jobs:
       # 5. Install Android Command Line Tools
       - name: Install Android SDK Command Line Tools
         run: |
-          sudo mkdir -p /usr/lib/android-sdk/cmdline-tools
-          sudo mkdir -p /usr/lib/android-sdk/cmdline-tools/latest
+          sudo mkdir -p /usr/local/lib/android/sdk/cmdline-tools
+          sudo mkdir -p /usr/local/lib/android/sdk/cmdline-tools/latest
           curl -o sdk-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-          sudo unzip -qq sdk-tools.zip -d /usr/lib/android-sdk/cmdline-tools/latest
-          sudo chmod -R 777 /usr/lib/android-sdk
-          echo "export ANDROID_HOME=/usr/lib/android-sdk" >> $GITHUB_ENV
-          echo "export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH" >> $GITHUB_ENV
+          sudo unzip -qq sdk-tools.zip -d /usr/local/lib/android/sdk/cmdline-tools/latest
+          sudo chmod -R 777 /usr/local/lib/android/sdk
+          echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> $GITHUB_ENV
+          echo "PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH" >> $GITHUB_ENV
 
       # 6. Install Android tools and emulator
       - name: Install Android tools
@@ -59,9 +59,10 @@ jobs:
           adb wait-for-device
           adb shell input keyevent 82
 
-      # 8. Run Flutter integration tests
+      # 9. Run Flutter integration tests
       - name: Run integration tests
         env:
           DISPLAY: :99
         run: |
+          source $GITHUB_ENV
           flutter test integration_test/home_test.dart
