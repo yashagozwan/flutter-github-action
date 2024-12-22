@@ -1,42 +1,24 @@
-name: Flutter Integration Test with iOS Simulator
+name: test-my-app
 
-on: push
+on:
+  push:
+    branches:
+      - main
 
 jobs:
-  integration_test:
-    runs-on: macos-latest
+  test:
+    runs-on: macOS-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+      - uses: futureware-tech/simulator-action@v3
+        with:
+          model: "iPhone 14"
+
+      - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
 
-      - name: Install Dependencies
-        run: flutter pub get
-
-      - name: Install Xcode Command Line Tools
-        run: |
-          sudo xcode-select --switch /Applications/Xcode_13.2.app/Contents/Developer
-          sudo xcodebuild -license accept
-
-      - name: Create and Boot iOS Simulator
-        run: |
-          xcrun simctl list devices
-          # Create an iPhone simulator (e.g., iPhone 14)
-          xcrun simctl create "iPhone 14" com.apple.CoreSimulator.SimDeviceType.iPhone-14 com.apple.CoreSimulator.SimRuntime.iOS-15-4
-          # Boot the simulator
-          xcrun simctl boot "iPhone 14"
-          # Wait for the simulator to be ready
-          xcrun simctl bootstatus "iPhone 14" --wait
-
-      - name: Run Integration Tests
-        run: flutter test integration_test/home_test.dart
-
-      - name: Shutdown iOS Simulator
-        run: |
-          xcrun simctl shutdown "iPhone 14"
-          xcrun simctl erase "iPhone 14"
+      - run: flutter pub get
+      - run: flutter test integration_test/home_test.dart
