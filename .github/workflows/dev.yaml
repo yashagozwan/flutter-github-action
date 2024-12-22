@@ -24,62 +24,11 @@ jobs:
       - name: Setup gradle
         uses: gradle/gradle-build-action@v2
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          cmdline-tools-version: 12266719
-
-      - name: Install Android Emulator System Image
-        run: |
-          sdkmanager "system-images;android-33;google_apis;x86_64"
-          sdkmanager "system-images;android-27;google_apis_playstore;x86"
-          sdkmanager --licenses
-
-      - name: Add Emulator to PATH
-        run: echo "${ANDROID_HOME}/emulator" >> $GITHUB_PATH
-
-      - name: Create Android Emulator Step 1
-        run: |
-          echo "no" | avdmanager create avd -n pixel -k "system-images;android-33;google_apis;x86_64" -d pixel
-
-      - name: Create Android emulator Step 2
-        run: |
-          sdkmanager --install "system-images;android-31;google_apis;x86_64"
-          echo "no" | avdmanager --verbose create avd --force --name testAVD --abi google_apis/x86_64 --package 'system-images;android-31;google_apis;x86_64'
-
-      - name: Launch Emulator
-        run: |
-          $ANDROID_SDK_ROOT/emulator/emulator -list-avds
-          nohup $ANDROID_SDK_ROOT/emulator/emulator -avd testAVD -no-snapshot-load -no-audio -no-window &
-        
-      - name: Wait for Emulator to Boot
-        run: |
-          echo "Waiting for emulator to boot..."
-          boot_completed=0
-          retry=0
-          max_retries=30
-          while [[ $boot_completed -ne 1 && $retry -lt $max_retries ]]; do
-            boot_completed=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
-            if [[ $boot_completed -ne 1 ]]; then
-              echo "Emulator not ready yet, retrying in 10 seconds... ($((retry + 1))/$max_retries)"
-              sleep 10
-            fi
-            retry=$((retry + 1))
-          done
-          if [[ $boot_completed -ne 1 ]]; then
-            echo "Emulator failed to boot within the timeout period."
-            exit 1
-          else
-            echo "Emulator booted successfully!"
-          fi
-        
-      - name: Wait for Emulator to Boot
-        run: |
-          adb wait-for-device
-          adb shell getprop sys.boot_completed
-
-      - name: List Available AVDs
-        run: avdmanager list avd
+      - name: Install Android SDK
+        uses: malinskiy/action-android/install-sdk@release/0.1.2
+      - run: echo $ANDROID_HOME
+      - run: sdkmanager --install "ndk;23.1.7779620"
+      - run: sdkmanager --install "build-tools;30.0.3"
 
       - name: Flutter check
         run: flutter --version
