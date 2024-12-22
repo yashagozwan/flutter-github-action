@@ -7,28 +7,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Set up Flutter
-      - name: Set up Flutter
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: "zulu"
+          java-version: "11"
+
+      - name: Setup Flutter (stable)
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: stable
+          channel: "stable"
 
-      # 3. Install dependencies
       - name: Install dependencies
         run: flutter pub get
 
-      # 4. Enable integration test device
       - name: Set up virtual display for integration tests
         run: |
           sudo apt-get update
           sudo apt-get install -y xvfb
           Xvfb :99 -screen 0 640x480x24 &
 
-      # 5. Run integration tests
       - name: Run integration tests
         env:
           DISPLAY: :99
