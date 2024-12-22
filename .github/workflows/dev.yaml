@@ -28,20 +28,32 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      # 5. Set up Android tools
+      # 5. Install Android Command Line Tools
+      - name: Install Android SDK Command Line Tools
+        run: |
+          sudo mkdir -p /usr/lib/android-sdk/cmdline-tools
+          sudo mkdir -p /usr/lib/android-sdk/cmdline-tools/latest
+          curl -o sdk-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+          sudo unzip -qq sdk-tools.zip -d /usr/lib/android-sdk/cmdline-tools/latest
+          sudo chmod -R 777 /usr/lib/android-sdk
+          echo "export ANDROID_HOME=/usr/lib/android-sdk" >> $GITHUB_ENV
+          echo "export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH" >> $GITHUB_ENV
+
+      # 6. Install Android tools and emulator
       - name: Install Android tools
         run: |
-          sudo apt-get update
-          sudo apt-get install -y lib32stdc++6 lib32z1 openjdk-11-jdk
+          source $GITHUB_ENV
+          sdkmanager --licenses
           sdkmanager "platform-tools" "platforms;android-31" "build-tools;31.0.0" "emulator" "system-images;android-31;default;x86_64"
 
-      # 6. Create Android emulator
+      # 7. Create Android emulator
       - name: Create Android emulator
         run: |
+          source $GITHUB_ENV
           echo "no" | avdmanager create avd -n test -k "system-images;android-31;default;x86_64" --force
           emulator -avd test -no-window -no-audio -no-boot-anim &
 
-      # 7. Wait for emulator to boot
+      # 8. Wait for emulator to boot
       - name: Wait for Android emulator to boot
         run: |
           adb wait-for-device
