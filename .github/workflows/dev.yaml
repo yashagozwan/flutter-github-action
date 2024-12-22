@@ -1,59 +1,42 @@
-name: Flutter Integration Test with Free Emulator
+name: Flutter Integration Test with iOS Simulator
 
 on: push
 
 jobs:
   integration_test:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Java
-        uses: actions/setup-java@v2
-        with:
-          distribution: "zulu"
-          java-version: "11"
-
-      - name: Setup Flutter
+      - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"
 
-      - name: Install Android SDK Command Line Tools
-        run: |
-          sudo mkdir -p /usr/local/lib/android/sdk/cmdline-tools
-          sudo mkdir -p /usr/local/lib/android/sdk/cmdline-tools/latest
-          curl -o sdk-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-          sudo unzip -qq sdk-tools.zip -d /usr/local/lib/android/sdk/cmdline-tools/latest
-          sudo chmod -R 777 /usr/local/lib/android/sdk
-          echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> $GITHUB_ENV
-          echo "PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH" >> $GITHUB_ENV
+      - name: Install Dependencies
+        run: flutter pub get
 
-      - name: Install Android tools
+      - name: Install Xcode Command Line Tools
         run: |
-          source $GITHUB_ENV
-          sdkmanager --licenses
-          sdkmanager "platform-tools" "platforms;android-31" "build-tools;31.0.0" "emulator" "system-images;android-31;default;x86_64"
+          sudo xcode-select --switch /Applications/Xcode_13.2.app/Contents/Developer
+          sudo xcodebuild -license accept
 
-      - name: Create and Start Emulator
+      - name: Create and Boot iOS Simulator
         run: |
-          source $GITHUB_ENV
-          echo "no" | avdmanager create avd -n test -k "system-images;android-31;default;x86_64" --force
-          emulator -avd test -no-snapshot -no-window -gpu off -no-boot-anim &
-
-      - name: Wait for Emulator to Boot
-        run: |
-          source $GITHUB_ENV
-          adb devices
-          adb wait-for-device
-          adb shell "while [[ -z \$(getprop sys.boot_completed) ]]; do sleep 1; done;"
-
-      - name: Unlock Emulator Screen
-        run: adb shell input keyevent 82
+          xcrun simctl list devices
+          # Create an iPhone simulator (e.g., iPhone 14)
+          xcrun simctl create "iPhone 14" com.apple.CoreSimulator.SimDeviceType.iPhone-14 com.apple.CoreSimulator.SimRuntime.iOS-15-4
+          # Boot the simulator
+          xcrun simctl boot "iPhone 14"
+          # Wait for the simulator to be ready
+          xcrun simctl bootstatus "iPhone 14" --wait
 
       - name: Run Integration Tests
-        env:
-          DISPLAY: :99
         run: flutter test integration_test/home_test.dart
+
+      - name: Shutdown iOS Simulator
+        run: |
+          xcrun simctl shutdown "iPhone 14"
+          xcrun simctl erase "iPhone 14"
