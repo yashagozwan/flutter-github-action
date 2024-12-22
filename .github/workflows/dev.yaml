@@ -13,7 +13,7 @@ jobs:
           channel: "stable"
       - run: flutter doctor
       - run: flutter pub get
-      - run: flutter pub clean
+      - run: flutter clean
       - run: flutter pub get
 
   analyze:
