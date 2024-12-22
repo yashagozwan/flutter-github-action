@@ -69,4 +69,4 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-      - run: flutter build apk
+      - run: flutter build lib/dev_main.dart apk --debug
